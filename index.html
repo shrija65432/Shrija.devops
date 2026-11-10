@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood Emoji Journal</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(120deg, #c8b7ff, #c4e9f7, #d8efff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px 12px;
+    color: #183153;
+}
+
+.journal {
+    width: 100%;
+    max-width: 430px;
+    padding: 25px 28px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.85);
+    box-shadow: 0 18px 45px rgba(45,75,125,0.16);
+}
+
+.date {
+    text-align: center;
+    color: #347b91;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 25px;
+    margin: 5px 0;
+    color: #142e50;
+}
+
+.subtitle {
+    text-align: center;
+    color: #52708e;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #315579;
+}
+
+.moods {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 25px;
+}
+
+.mood {
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 15px;
+    padding: 9px 2px;
+    cursor: pointer;
+    color: #345575;
+    transition: 0.2s;
+}
+
+.mood:hover {
+    background: #eef6ff;
+    transform: translateY(-2px);
+}
+
+.mood.selected {
+    border-color: #3985e9;
+    background: #e7f1ff;
+    box-shadow: 0 5px 13px rgba(50,120,220,0.14);
+}
+
+.emoji {
+    display: block;
+    font-size: 29px;
+}
+
+.mood-name {
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #315579;
+}
+
+textarea {
+    width: 100%;
+    height: 80px;
+    padding: 13px;
+    border: 1px solid #dce7f1;
+    border-radius: 13px;
+    outline: none;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 13px;
+    background: white;
+}
+
+textarea:focus {
+    border-color: #3985e9;
+}
+
+.save-btn {
+    width: 100%;
+    padding: 14px;
+    margin: 18px 0 25px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(100deg, #0878ed, #4967ed);
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 7px 16px rgba(35,105,220,0.22);
+}
+
+.save-btn:hover {
+    filter: brightness(1.1);
+}
+
+.message {
+    text-align: center;
+    font-size: 12px;
+    min-height: 15px;
+}
+
+.history-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #315579;
+    margin-bottom: 15px;
+}
+
+.count {
+    background: #e5f1ff;
+    color: #3479c9;
+    border-radius: 50%;
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.history-list {
+    display: grid;
+    gap: 10px;
+}
+
+.history-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #e3edf5;
+    border-radius: 13px;
+    background: white;
+}
+
+.history-emoji {
+    font-size: 25px;
+}
+
+.history-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.history-mood {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.history-date {
+    font-size: 10px;
+    color: #8196aa;
+}
+
+.history-note {
+    font-size: 12px;
+    color: #5d748a;
+    overflow-wrap: anywhere;
+}
+
+.delete-btn {
+    border: none;
+    background: transparent;
+    color: #9aabba;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.delete-btn:hover {
+    color: red;
+}
+
+.empty {
+    text-align: center;
+    color: #8ba1b5;
+    font-size: 13px;
+    padding: 15px;
+}
+
+.empty span {
+    display: block;
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+@media(max-width:380px) {
+    .journal {
+        padding: 20px 15px;
+    }
+
+    .emoji {
+        font-size: 25px;
+    }
+
+    .mood-name {
+        font-size: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="journal">
+
+    <div class="date" id="todayDate"></div>
+
+    <h1>Mood Emoji Journal</h1>
+
+    <p class="subtitle">
+        How are you feeling right now?
+    </p>
+
+    <div class="section-title">
+        <span>CHOOSE YOUR MOOD</span>
+        <span id="selectedMood">No mood selected</span>
+    </div>
+
+    <div class="moods">
+
+        <button class="mood" data-mood="Happy" data-emoji="😊">
+            <span class="emoji">😊</span>
+            <span class="mood-name">Happy</span>
+        </button>
+
+        <button class="mood" data-mood="Sad" data-emoji="😢">
+            <span class="emoji">😢</span>
+            <span class="mood-name">Sad</span>
+        </button>
+
+        <button class="mood" data-mood="Angry" data-emoji="😡">
+            <span class="emoji">😡</span>
+            <span class="mood-name">Angry</span>
+        </button>
+
+        <button class="mood" data-mood="Tired" data-emoji="😴">
+            <span class="emoji">😴</span>
+            <span class="mood-name">Tired</span>
+        </button>
+
+        <button class="mood" data-mood="Excited" data-emoji="🤩">
+            <span class="emoji">🤩</span>
+            <span class="mood-name">Excited</span>
+        </button>
+
+    </div>
+
+    <label for="reason">
+        Why do you feel this way?
+    </label>
+
+    <textarea id="reason"
+    placeholder="Add a one-sentence thought or memory... (optional)"></textarea>
+
+    <button class="save-btn" id="saveMood">
+        ▣ &nbsp; Save Mood
+    </button>
+
+    <p class="message" id="message"></p>
+
+    <div class="history-heading">
+        My Mood History
+        <span class="count" id="historyCount">0</span>
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+
+</div>
+
+<script>
+
+// Get HTML elements
+const moodButtons = document.querySelectorAll(".mood");
+const selectedMoodText = document.getElementById("selectedMood");
+const reasonInput = document.getElementById("reason");
+const saveButton = document.getElementById("saveMood");
+const historyList = document.getElementById("historyList");
+const historyCount = document.getElementById("historyCount");
+const message = document.getElementById("message");
+
+// Selected mood variables
+let selectedMood = null;
+let selectedEmoji = null;
+
+// Get saved mood history
+let moodHistory = JSON.parse(
+    localStorage.getItem("moodJournalEntries") || "[]"
+);
+
+// Display current date
+document.getElementById("todayDate").textContent =
+    new Date().toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+    });
+
+// Mood selection
+moodButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        moodButtons.forEach(item => {
+            item.classList.remove("selected");
+        });
+
+        button.classList.add("selected");
+
+        selectedMood = button.dataset.mood;
+        selectedEmoji = button.dataset.emoji;
+
+        selectedMoodText.textContent =
+            selectedEmoji + " " + selectedMood;
+
+        message.textContent = "";
+    });
+
+});
+
+// Save mood
+saveButton.addEventListener("click", () => {
+
+    if (!selectedMood) {
+        message.style.color = "red";
+        message.textContent = "Please choose your mood first.";
+        return;
+    }
+
+    const entry = {
+        id: Date.now(),
+        mood: selectedMood,
+        emoji: selectedEmoji,
+        note: reasonInput.value.trim(),
+        date: new Date().toISOString()
+    };
+
+    moodHistory.unshift(entry);
+
+    // Save data in local storage
+    localStorage.setItem(
+        "moodJournalEntries",
+        JSON.stringify(moodHistory)
+    );
+
+    // Reset form
+    reasonInput.value = "";
+    selectedMood = null;
+    selectedEmoji = null;
+
+    selectedMoodText.textContent = "No mood selected";
+
+    moodButtons.forEach(item => {
+        item.classList.remove("selected");
+    });
+
+    message.style.color = "green";
+    message.textContent = "Your mood has been saved!";
+
+    renderHistory();
+
+});
+
+// Display mood history
+function renderHistory() {
+
+    historyList.innerHTML = "";
+
+    historyCount.textContent = moodHistory.length;
+
+    if (moodHistory.length === 0) {
+
+        historyList.innerHTML =
+            '<div class="empty"><span>🌱</span>Your mood history will appear here.</div>';
+
+        return;
+    }
+
+    moodHistory.forEach(entry => {
+
+        const item = document.createElement("article");
+        item.className = "history-item";
+
+        const emoji = document.createElement("div");
+        emoji.className = "history-emoji";
+        emoji.textContent = entry.emoji;
+
+        const content = document.createElement("div");
+        content.className = "history-content";
+
+        const top = document.createElement("div");
+        top.className = "history-top";
+
+        const moodName = document.createElement("span");
+        moodName.className = "history-mood";
+        moodName.textContent = entry.mood;
+
+        const date = document.createElement("span");
+        date.className = "history-date";
+        date.textContent = new Date(entry.date).toLocaleString();
+
+        const note = document.createElement("p");
+        note.className = "history-note";
+        note.textContent = entry.note || "No note added.";
+
+        const remove = document.createElement("button");
+        remove.className = "delete-btn";
+        remove.textContent = "×";
+        remove.title = "Delete entry";
+
+        remove.addEventListener("click", () => {
+            deleteEntry(entry.id);
+        });
+
+        top.append(moodName, date);
+        content.append(top, note);
+
+        item.append(emoji, content, remove);
+
+        historyList.appendChild(item);
+
+    });
+
+}
+
+// Delete mood history entry
+function deleteEntry(id) {
+
+    moodHistory = moodHistory.filter(entry => entry.id !== id);
+
+    localStorage.setItem(
+        "moodJournalEntries",
+        JSON.stringify(moodHistory)
+    );
+
+    renderHistory();
+
+}
+
+// Load saved history when page opens
+renderHistory();
+
+</script>
+
+</body>
+</html>
